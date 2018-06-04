@@ -19,12 +19,12 @@ def my_crawl(name):
         downloader_threads=4,
         storage={'root_dir': '/Volumes/USB STICK/image database/images/google3'})
     filters = dict(
-        size='large',
+        size='=512x512',
         license='commercial,modify',
         date=((2017, 1, 1), (2017, 11, 30)))
-    google_crawler.crawl(keyword=name + "filetype:png", filters=filters, max_num=400, file_idx_offset=0)
+    google_crawler.crawl(keyword=name , filters=filters, max_num=400, file_idx_offset=0)
 
 
-f = open("keywords2.txt", "r")
+f = open("keywords.txt", "r")
 for line in f:
     my_crawl(line + " ")
