@@ -7,7 +7,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import numpy as np
 
 BATCH_SIZE = 10
-num_epochs = 100
+num_epochs = 1
 device = 'cpu'
 
 

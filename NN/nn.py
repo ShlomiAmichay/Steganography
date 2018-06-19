@@ -111,6 +111,12 @@ class Neural_Net(nn.Module):
 
 
 def predict(model, data_loader):
+    '''
+    preduct output from given model and data loader.
+    :param model:
+    :param data_loader:
+    :return:
+    '''
     model.eval()
     with open('test.pred', 'w+') as f:
         for data, real_tag in data_loader:
@@ -120,31 +126,33 @@ def predict(model, data_loader):
                 f.write(str(sample.argmax()) + '\n')
 
 
-model = Neural_Net(32 * 32 * 3)
-model.apply(weight_init)
+if __name__ == "__main__":
 
-# transforms made on data
-transforms = torchvision.transforms.Compose([torchvision.transforms.ToTensor(),
-                                             torchvision.transforms.Normalize((0.1307,), (0.3081,))])
-stenog_dataset = torchvision.datasets.ImageFolder(
-    root='/home/daniel/Documents/stang_proj/stenography/ready train', transform=transforms)
+    model = Neural_Net(32 * 32 * 3)
+    model.apply(weight_init)
 
-train_loader, val_loader = train_val_split(stenog_dataset)
+    # transforms made on data
+    transforms = torchvision.transforms.Compose([torchvision.transforms.ToTensor(),
+                                                 torchvision.transforms.Normalize((0.1307,), (0.3081,))])
+    stenog_dataset = torchvision.datasets.ImageFolder(
+        root='/home/daniel/Documents/stang_proj/stenography/ready train', transform=transforms)
 
-# set optimizer
-optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+    train_loader, val_loader = train_val_split(stenog_dataset)
 
-train_loss = []
-val_loss = []
+    # set optimizer
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
-for epoch in range(1, 20 + 1):
-    print('Epoch: ', epoch)
-    train(model=model, optimizer=optimizer, train_loader=train_loader)
-    train_loss.append(model_check(model=model, loader=train_loader, test_or_val="Train"))
-    val_loss.append(model_check(model=model, loader=val_loader, test_or_val="Validation"))
+    train_loss = []
+    val_loss = []
 
-# Plot graphs
-s = plt.plot(range(epoch), val_loss, color="red", label="Validation Avg Loss")
-t = plt.plot(range(epoch), train_loss, color="blue", label="Train Avg Loss")
+    for epoch in range(1, 20 + 1):
+        print('Epoch: ', epoch)
+        train(model=model, optimizer=optimizer, train_loader=train_loader)
+        train_loss.append(model_check(model=model, loader=train_loader, test_or_val="Train"))
+        val_loss.append(model_check(model=model, loader=val_loader, test_or_val="Validation"))
 
-plt.show()
+    # Plot graphs
+    s = plt.plot(range(epoch), val_loss, color="red", label="Validation Avg Loss")
+    t = plt.plot(range(epoch), train_loss, color="blue", label="Train Avg Loss")
+
+    plt.show()

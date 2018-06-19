@@ -158,6 +158,7 @@ def encrypt(img, msg):
 
 
 if __name__ == "__main__":
+
     # where to get input image from
     dir = "./raw train png/"
     # output dir
