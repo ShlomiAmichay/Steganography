@@ -1,7 +1,6 @@
 from PIL import Image, ImageMath
 import random
 import math
-import shutil
 import os
 
 
@@ -48,11 +47,11 @@ def random_bl_and_jump(img, msg_len):
     n = img.width
     m = img.height
 
-    bit_layer = random.randint(0, 4)
+    bit_layer = random.randint(1, 3)
 
     max_jmp = math.floor((n * m) / msg_len)
 
-    jump = random.randint(1, max_jmp)
+    jump = random.randint(1, 3)
 
     channel = random.randint(0, 3)
 
@@ -82,7 +81,8 @@ def encrypt(img, msg):
     m_len = len(msg_binary)
 
     # get random jump and bl for encryption
-    jump, bl, channel = random_bl_and_jump(img, m_len)
+    # jump, bl, channel = random_bl_and_jump(img, m_len)
+    jump, bl, channel = 2, 3, 1
 
     pixel_list = list(img.getdata())
     i = 0
@@ -154,10 +154,11 @@ if not os.path.exists(outdir + '/reg/'):
     os.makedirs(outdir + '/reg/')
 
 stat = open(outdir + '/stats.txt', 'w+')
-total_iter = len(os.walk(dir))
+
+# total_iter = len(os.walk(dir))
 for root, subFolders, files in os.walk(dir):
     for i, file in enumerate(files):
-        printProgressBar(i + 1, total_iter, "Progress", "Complete")
+        # printProgressBar(i + 1, 50000, "Progress", "Complete")
         if '.png' in file:
             fg = Image.open(dir + '/' + file)
             msg = random_line('text files/1.txt')

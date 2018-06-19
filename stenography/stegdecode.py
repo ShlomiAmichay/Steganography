@@ -6,7 +6,7 @@ def text_to_bits(text, encoding='utf-8', errors='surrogatepass'):
     return bits.zfill(8 * ((len(bits) + 7) // 8))
 
 
-def text_from_bits(bits, encoding='utf-8', errors='surrogatepass'):
+def text_from_bits(bits, encoding=h'utf-8', errors='surrogatepass'):
     n = int(bits, 2)
     s = n.to_bytes(n.bit_length(), 'big')
     return n.to_bytes((n.bit_length() + 7) // 8, 'big').decode(encoding, errors) or '\0'

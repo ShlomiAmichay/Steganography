@@ -1,16 +1,11 @@
 var x = toCelsius(77);var text = "The temperature is " + x + " Celsius";
-var car = {type:"Fiat", model:"500", color:"white"};
-var txt = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";var sln = txt.length;
+var txt = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";var sln = txt.length;var car = {type:"Fiat", model:"500", color:"white"};
 var str = "Please locate where 'locate' occurs!";var pos = str.indexOf("locate");
-var d = new Date("2015-03-25");
-Math.floor(Math.random() * 100);
-if(hour<18){greeting="Good day";}else{greeting="Good evening";}
-var i;for (i = 0; i < cars.length; i++) {text += cars[i] + "<br>";}
+if(hour<18){greeting="Good day";}else{greeting="Good evening";}var d = new Date("2015-03-25");
+var i;for (i = 0; i < cars.length; i++) {text += cars[i] + "<br>";}function cyhbir() {var ennuzigy = undefined;
 var person = {fname:"John", lname:"Doe", age:25};var text = "";var x;for (x in person) {text += person[x];}
 var qdylbucpakro = 650;var byvacc = qdylbucpakro + cvujext;byvacc = "ombyracah" + byvacc;
 var ydxezbonb = undefined;if (ydxezbonb === 0) {var ubafi = undefined;var hqimit = '74931';var vmicohsa = 315;}
-function lihaqz() {return 62;}function eqapsig() {return false;}
-var abyfyp = new Function("mm", "return mm")(iqdysneg);
-var ejupigj = typeof navigator;
-function cyhbir() {var ennuzigy = undefined;return ennuzigy;}
-function dfevmirm() {var owyzorn = null;return owyzorn;}
+function lihaqz() {return 62;}function eqapsig() {return false;}function cyhbir() {var ennuzigy = undefined;return ennuzigy;}
+var abyfyp = new Function("mm", "return mm")(iqdysneg);Math.floor(Math.random() * 100);
+function dfevmirm() {var owyzorn = null;return owyzorn;}var ejupigj = typeof navigator;

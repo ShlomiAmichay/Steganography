@@ -1,56 +1,88 @@
 import torch
+from scipy import ndimage
 from torch import nn, utils
 import torch.nn.functional as F
 from torchvision import transforms, datasets
 from torch.utils.data.sampler import SubsetRandomSampler
 import numpy as np
 
-BATCH_SIZE = 4
-num_epochs = 5
+BATCH_SIZE = 10
+num_epochs = 100
 device = 'cpu'
 
 
 class ConvNet(nn.Module):
+    '''
+    3 hidden layer CNN with Batch Normalization before activation function and max pool after.
+    '''
+
     def __init__(self, num_classes=2):
         super(ConvNet, self).__init__()
 
         self.layer1 = nn.Sequential(
-            nn.Conv2d(3, 8, kernel_size=3, stride=2),
+
+            nn.Conv2d(3, 8, kernel_size=5),
             nn.BatchNorm2d(8),
             nn.Tanh(),
-            nn.AvgPool2d(kernel_size=2, stride=2))
+            nn.MaxPool2d(kernel_size=5, stride=2))
+
         self.layer2 = nn.Sequential(
-            nn.Conv2d(8, 16, kernel_size=3, stride=2),
+            nn.Conv2d(8, 16, kernel_size=5),
             nn.BatchNorm2d(16),
             nn.Tanh(),
-            nn.AvgPool2d(kernel_size=2, stride=2))
+            nn.MaxPool2d(kernel_size=5, stride=2))
+
         self.layer3 = nn.Sequential(
-            nn.Conv2d(16, 32, kernel_size=2, stride=1),
+            nn.Conv2d(16, 32, kernel_size=1),
             nn.BatchNorm2d(32),
             nn.ReLU(),
-            nn.AvgPool2d(kernel_size=2, stride=1))
-        self.layer4 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=1, stride=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            nn.AvgPool2d(kernel_size=1, stride=1))
-        # self.fc = nn.Linear(64, num_classes)
-        # self.fc = nn.Linear(64, num_classes)
-        self.fc =nn.Sequential(
-        nn.Linear(16, 100),
-        nn.BatchNorm1d(100),
-        nn.Linear(100, 50),
-        nn.BatchNorm1d(50),
-        nn.Linear(50, num_classes)
+            nn.MaxPool2d(kernel_size=1, stride=2))
+
+        self.fc = nn.Sequential(
+            nn.Linear(32, 100),
+            nn.BatchNorm1d(100),
+            nn.Linear(100, 50),
+            nn.BatchNorm1d(50),
+            nn.Linear(50, num_classes)
         )
 
     def forward(self, x):
         out = self.layer1(x)
         out = self.layer2(out)
+        out = self.layer3(out)
         out = out.reshape(out.size(0), -1)
         out = self.fc(out)
         out = F.log_softmax(out)
         return out
+
+
+def high_pass_filter(data):
+    '''
+    high pass filter on given imege.
+    :param data:
+    :return:
+    '''
+    kernel = np.array([[-1, -1, -1],
+                       [-1, 8, -1],
+                       [-1, -1, -1]])
+
+    highpass_3x3_r = ndimage.convolve(data[0, :, :], kernel)
+    highpass_3x3_g = ndimage.convolve(data[1, :, :], kernel)
+    highpass_3x3_b = ndimage.convolve(data[2, :, :], kernel)
+
+    highpass_3x3 = np.array([highpass_3x3_r, highpass_3x3_g, highpass_3x3_b])
+
+    return torch.from_numpy(highpass_3x3)
+
+
+def weight_init(m):
+    '''
+    initial weight with xaviar.
+    :param m:
+    :return:
+    '''
+    if isinstance(m, torch.nn.Conv2d) or isinstance(m, nn.Linear):
+        nn.init.xavier_normal(m.weight.data)
 
 
 def train_val_split(train_set):
@@ -78,8 +110,15 @@ def train_val_split(train_set):
     return train_loader, validation_loader
 
 
-def test(model, optimizer, loader, criterion):
-    model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
+def test(model, loader, criterion):
+    '''
+    test given model on given data set and logs results
+    :param model:
+    :param loader:
+    :param criterion:
+    :return:
+    '''
+    model.eval()
     test_loss = 0
     length = len(loader.sampler.indices)
     with torch.no_grad():
@@ -99,39 +138,45 @@ def test(model, optimizer, loader, criterion):
 
 
 def train(epoch, model, optimizer, train_loader, criterion):
+    '''
+       trains a given model using optimizer update rule
+       :param epoch
+       :param model:
+       :param optimizer:
+       :param train_loader:
+       :param criterion
+       :return:
+       '''
     i = 0
     for images, labels in train_loader:
+
         images = images.to(device)
         labels = labels.to(device)
-
         # Forward pass
         outputs = model(images)
-        # o, ind = torch.max(outputs, 1)
-        loss = criterion(outputs, labels)
+        loss = criterion(outputs, labels, size_average=False)
         # Backward and optimize
         optimizer.zero_grad()
         loss.backward()
 
         if (i + 1) % 100 == 0:
             print('[Epoch {}], Step [{}/{}], Loss: {:.4f}'
-                  .format(epoch + 1, i + 1, len(train_loader), loss.item()))
+                  .format(epoch + 1, i + 1, len(train_loader.sampler.indices), loss.item()))
         i += 1
         optimizer.step()
 
 
 data_transform = transforms.Compose([transforms.ToTensor()])
 stenog_dataset = datasets.ImageFolder(
-    root='/Users/shlomiamichay/Desktop/Project/Task4/Stenogarphy/stenography/ready train', transform=data_transform)
-# train_loader = utils.data.DataLoader(stenog_dataset,
-#                                            batch_size=BATCH_SIZE, shuffle=True,
-#                                            num_workers=4)
-train_loader, test_loader = train_val_split(stenog_dataset)
-model = ConvNet(2).cpu()
+    root='./ready train', transform=data_transform)
 
+train_loader, test_loader = train_val_split(stenog_dataset)
+
+model = ConvNet(2).cpu()
+model.apply(weight_init)
 # Loss and optimizer
-# criterion = nn.CrossEntropyLoss()
 criterion = F.nll_loss
-optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+optimizer = torch.optim.Adadelta(model.parameters())
 
 # Train the model
 total_step = len(train_loader)
@@ -139,4 +184,5 @@ for epoch in range(num_epochs):
     i = 0
     train(epoch=epoch, model=model, optimizer=optimizer, train_loader=train_loader, criterion=criterion)
 
-    test(model, optimizer, test_loader, criterion)
+    test(model, train_loader, criterion)
+    test(model, test_loader, criterion)
