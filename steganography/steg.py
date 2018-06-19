@@ -1,42 +1,40 @@
 from PIL import Image, ImageMath
 import random
 import math
-import shutil
 import os
 
 
-def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█'):
-    """
-    Call in a loop to create terminal progress bar
-    @params:
-        iteration   - Required  : current iteration (Int)
-        total       - Required  : total iterations (Int)
-        prefix      - Optional  : prefix string (Str)
-        suffix      - Optional  : suffix string (Str)
-        decimals    - Optional  : positive number of decimals in percent complete (Int)
-        length      - Optional  : character length of bar (Int)
-        fill        - Optional  : bar fill character (Str)
-    """
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filledLength = int(length * iteration // total)
-    bar = fill * filledLength + '-' * (length - filledLength)
-    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end='\r')
-    # Print New Line on Complete
-    if iteration == total:
-        print()
-
-
 def text_to_bits(text, encoding='utf-8', errors='surrogatepass'):
+    '''
+    Converts text to bits
+    :param text:
+    :param encoding:
+    :param errors:
+    :return:
+    '''
     bits = bin(int.from_bytes(text.encode(encoding, errors), 'big'))[2:]
     return bits.zfill(8 * ((len(bits) + 7) // 8))
 
 
 def text_from_bits(bits, encoding='utf-8', errors='surrogatepass'):
+    '''
+    converts bits to text
+    :param bits:
+    :param encoding:
+    :param errors:
+    :return:
+    '''
     n = int(bits, 2)
     return n.to_bytes((n.bit_length() + 7) // 8, 'big').decode(encoding, errors) or '\0'
 
 
 def build_masks(bl):
+    '''
+    returns bitwise masks for given BitLayer
+    :param bl:
+    :return:
+    '''
+    #
     or_mask = pow(2, bl)
 
     and_mask = pow(2, 8) - 1 - pow(2, bl)
@@ -45,6 +43,12 @@ def build_masks(bl):
 
 
 def random_bl_and_jump(img, msg_len):
+    '''
+    generate random BitLayer and jump between encrypted pixels
+    :param img:
+    :param msg_len:
+    :return:
+    '''
     n = img.width
     m = img.height
 
@@ -60,6 +64,11 @@ def random_bl_and_jump(img, msg_len):
 
 
 def random_line(f_name):
+    '''
+    chooses a random line from given file
+    :param f_name:
+    :return:
+    '''
     lines = open(f_name, 'r')
 
     line = next(lines)
@@ -71,9 +80,16 @@ def random_line(f_name):
 
 
 def encrypt(img, msg):
+    '''
+    given an image and messages, creates ste
+    :param img:
+    :param msg:
+    :return:
+    '''
     # get image dim:
     n = img.width
     m = img.height
+
     # create new image object
     encrypted_img = Image.new(img.mode, (n, m))
 
@@ -140,35 +156,43 @@ def encrypt(img, msg):
     return encrypted_img, bl, jump, channel, m_len
 
 
-############# Script starts here #############
-dir = "./raw train png/"
-outdir = 'ready train'
+if __name__ == "__main__":
+    # where to get input image from
+    dir = "./raw train png/"
+    # output dir
+    outdir = 'ready train'
 
-if not os.path.exists(outdir):
-    os.makedirs(outdir)
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
-if not os.path.exists(outdir + '/st/'):
-    os.makedirs(outdir + '/st/')
+    if not os.path.exists(outdir + '/st/'):
+        os.makedirs(outdir + '/st/')
 
-if not os.path.exists(outdir + '/reg/'):
-    os.makedirs(outdir + '/reg/')
+    if not os.path.exists(outdir + '/reg/'):
+        os.makedirs(outdir + '/reg/')
 
-stat = open(outdir + '/stats.txt', 'w+')
-total_iter = len(os.walk(dir))
-for root, subFolders, files in os.walk(dir):
-    for i, file in enumerate(files):
-        printProgressBar(i + 1, total_iter, "Progress", "Complete")
-        if '.png' in file:
-            fg = Image.open(dir + '/' + file)
-            msg = random_line('text files/1.txt')
-            prob = random.randrange(0, 100)
-            if prob > 50:
-                n_img, bl, jmp, cha, length = encrypt(fg, msg)
-                f_name = 'st_' + str(i) + '.png'
-                n_img.save(outdir + '/st/' + f_name)
-                n_img.close()
-                stat.write(f_name + ',' + str(bl) + ',' + str(jmp) + ',' + str(cha) + ',' + str(length) + "\n")
-            else:
-                fg.save(outdir + '/reg/' + str(i) + '.png')
+    # stats file will save the random variables chosen (bitlayer,jums, etc)
+    stat = open(outdir + '/stats.txt', 'w+')
 
-stat.close()
+    # iterate over all files in input dir
+    for root, subFolders, files in os.walk(dir):
+        for i, file in enumerate(files):
+            if '.png' in file:
+                # open Image
+                fg = Image.open(dir + '/' + file)
+
+                # encrypt image in probability of 1/2
+                prob = random.randrange(0, 100)
+                if prob > 50:
+                    # take random JS line from our file
+                    msg = random_line('text files/1.txt')
+                    # encrypt and save random steganography variables chosen
+                    n_img, bl, jmp, cha, length = encrypt(fg, msg)
+                    f_name = 'st_' + str(i) + '.png'
+                    n_img.save(outdir + '/st/' + f_name)
+                    n_img.close()
+                    stat.write(f_name + ',' + str(bl) + ',' + str(jmp) + ',' + str(cha) + ',' + str(length) + "\n")
+                else:
+                    fg.save(outdir + '/reg/' + str(i) + '.png')
+
+    stat.close()
