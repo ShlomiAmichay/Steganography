@@ -10,7 +10,7 @@ LR = 0.01
 BATCH_SIZE = 10
 NUM_OF_EPOCHS = 20
 IMAGE_SIZE = 32 * 32 * 3
-
+DATASET_DIR = '/home/daniel/Documents/stang_proj/stenography/ready train'
 def train_val_split(train_set):
     '''
     splits train set into 80:20 train and validation
@@ -136,7 +136,7 @@ if __name__ == "__main__":
     transforms = torchvision.transforms.Compose([torchvision.transforms.ToTensor(),
                                                  torchvision.transforms.Normalize((0.1307,), (0.3081,))])
     stenog_dataset = torchvision.datasets.ImageFolder(
-        root='/home/daniel/Documents/stang_proj/stenography/ready train', transform=transforms)
+        root=DATASET_DIR, transform=transforms)
 
     train_loader, val_loader = train_val_split(stenog_dataset)
 
