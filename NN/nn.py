@@ -8,7 +8,8 @@ import numpy as np
 
 LR = 0.01
 BATCH_SIZE = 10
-
+NUM_OF_EPOCHS = 20
+IMAGE_SIZE = 32 * 32 * 3
 
 def train_val_split(train_set):
     '''
@@ -128,7 +129,7 @@ def predict(model, data_loader):
 
 if __name__ == "__main__":
 
-    model = Neural_Net(32 * 32 * 3)
+    model = Neural_Net(IMAGE_SIZE)
     model.apply(weight_init)
 
     # transforms made on data
@@ -140,12 +141,12 @@ if __name__ == "__main__":
     train_loader, val_loader = train_val_split(stenog_dataset)
 
     # set optimizer
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+    optimizer = torch.optim.SGD(model.parameters(), lr=LR)
 
     train_loss = []
     val_loss = []
 
-    for epoch in range(1, 20 + 1):
+    for epoch in range(1, NUM_OF_EPOCHS + 1):
         print('Epoch: ', epoch)
         train(model=model, optimizer=optimizer, train_loader=train_loader)
         train_loss.append(model_check(model=model, loader=train_loader, test_or_val="Train"))
