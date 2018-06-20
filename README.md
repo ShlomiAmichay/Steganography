@@ -3,8 +3,8 @@
 ## Overview
 
 Steganography is the practice of concealing a file, message, image, or video within another file, message, image, or video.
-This code repository contains scipts that encrypts and decrypts text into/from PNG images using bitwise operators (on a chosen bit layer)
-We produced out own Dataset, using the cifar-10 image DataSet, and running the encryption Script supplied in this repository
+This code repository contains scripts that encrypts and decrypts text into/from PNG images using bitwise operators (on a chosen bit layer)
+Wev'e produced our own Dataset, using the cifar-10 image DataSet, and running the encryption Script supplied in this repository
 
 ## Dependencies 
 We used Python 3.6, the required libraries are:
