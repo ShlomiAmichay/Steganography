@@ -6,7 +6,7 @@ import torchvision
 import matplotlib.pyplot as plt
 import numpy as np
 
-LR = 0.01
+LR = 0.0005
 BATCH_SIZE = 10
 
 
@@ -110,6 +110,29 @@ class Neural_Net(nn.Module):
         return F.log_softmax(x)
 
 
+def plot_avg(avg_train, avg_valid, epoch):
+    '''
+    plot average  loss train and validation.
+    :param avg_train:
+    :param avg_valid:
+    :param type:
+    :param epoch:
+    :return:
+    '''
+    xs = np.arange(0, epoch, 2)
+    plt.plot(avg_train, color="red", label="Average loss train")
+    plt.plot(avg_valid, color="blue", label="Average loss validation")
+
+    # Create a legend for the first line.
+    first_legend = plt.legend(loc=1)
+
+    # Add the legend manually to the current Axes.
+    ax = plt.gca().add_artist(first_legend)
+    plt.xlabel('Epoch Number')
+    plt.ylabel('Average loss')
+    plt.show()
+
+
 def predict(model, data_loader):
     '''
     preduct output from given model and data loader.
@@ -145,14 +168,11 @@ if __name__ == "__main__":
     train_loss = []
     val_loss = []
 
-    for epoch in range(1, 20 + 1):
+    for epoch in range(1, 30 + 1):
         print('Epoch: ', epoch)
         train(model=model, optimizer=optimizer, train_loader=train_loader)
         train_loss.append(model_check(model=model, loader=train_loader, test_or_val="Train"))
         val_loss.append(model_check(model=model, loader=val_loader, test_or_val="Validation"))
 
     # Plot graphs
-    s = plt.plot(range(epoch), val_loss, color="red", label="Validation Avg Loss")
-    t = plt.plot(range(epoch), train_loss, color="blue", label="Train Avg Loss")
-
-    plt.show()
+    plot_avg(train_loss, val_loss, epoch)

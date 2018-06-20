@@ -166,23 +166,27 @@ def train(epoch, model, optimizer, train_loader, criterion):
         optimizer.step()
 
 
-data_transform = transforms.Compose([transforms.ToTensor()])
-stenog_dataset = datasets.ImageFolder(
-    root='./ready train', transform=data_transform)
+if __name__ == "__main__":
 
-train_loader, test_loader = train_val_split(stenog_dataset)
+    # transforms made on data
+    data_transform = transforms.Compose([transforms.ToTensor()])
+    stenog_dataset = datasets.ImageFolder(
+        root='./ready train', transform=data_transform)
 
-model = ConvNet(2).cpu()
-model.apply(weight_init)
-# Loss and optimizer
-criterion = F.nll_loss
-optimizer = torch.optim.Adadelta(model.parameters())
+    train_loader, val_loader = train_val_split(stenog_dataset)
 
-# Train the model
-total_step = len(train_loader)
-for epoch in range(num_epochs):
-    i = 0
-    train(epoch=epoch, model=model, optimizer=optimizer, train_loader=train_loader, criterion=criterion)
+    model = ConvNet(2).cpu()
+    model.apply(weight_init)
 
-    test(model, train_loader, criterion)
-    test(model, test_loader, criterion)
+    # Loss and optimizer
+    criterion = F.nll_loss
+    optimizer = torch.optim.Adadelta(model.parameters())
+
+    # Train the model
+    total_step = len(train_loader)
+
+    for epoch in range(num_epochs):
+        i = 0
+        train(epoch=epoch, model=model, optimizer=optimizer, train_loader=train_loader, criterion=criterion)
+        test(model, train_loader, criterion)
+        test(model, val_loader, criterion)
