@@ -62,8 +62,23 @@ DATASET_DIR = '/home/daniel/Documents/stang_proj/stenography/ready train'
 
 Once all parameters defiend you are good to go, running the script will train the model and output results
 
-##Results
+## Results
+With random Steganography we have'nt achived significant results.
+after using same bit layer, jumps and channel Wev'e reached 97% accuracy on validation Set (at Epoch 25)
 
+```
+('Epoch: ', 23)
+Train set: Average loss: 0.1880, Accuracy: 36824/40000 (92%)
+Validation set: Average loss: 0.1995, Accuracy: 9159/9999 (91%)
+('Epoch: ', 24)
+Train set: Average loss: 0.1399, Accuracy: 38190/40000 (95%)
+Validation set: Average loss: 0.1574, Accuracy: 9476/9999 (94%)
+('Epoch: ', 25)
+Train set: Average loss: 0.0917, Accuracy: 39047/40000 (97%)
+Validation set: Average loss: 0.1060, Accuracy: 9717/9999 (97%)
+```
+
+![alt text](./Results/plt.png)
 
 
 ## TEAM
