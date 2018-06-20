@@ -6,10 +6,11 @@ import torchvision
 import matplotlib.pyplot as plt
 import numpy as np
 
-LR = 0.0005
+LR = 0.01
 BATCH_SIZE = 10
-
-
+NUM_OF_EPOCHS = 20
+IMAGE_SIZE = 32 * 32 * 3
+DATASET_DIR = '/home/daniel/Documents/stang_proj/stenography/ready train'
 def train_val_split(train_set):
     '''
     splits train set into 80:20 train and validation
@@ -151,24 +152,24 @@ def predict(model, data_loader):
 
 if __name__ == "__main__":
 
-    model = Neural_Net(32 * 32 * 3)
+    model = Neural_Net(IMAGE_SIZE)
     model.apply(weight_init)
 
     # transforms made on data
     transforms = torchvision.transforms.Compose([torchvision.transforms.ToTensor(),
                                                  torchvision.transforms.Normalize((0.1307,), (0.3081,))])
     stenog_dataset = torchvision.datasets.ImageFolder(
-        root='/home/daniel/Documents/stang_proj/stenography/ready train', transform=transforms)
+        root=DATASET_DIR, transform=transforms)
 
     train_loader, val_loader = train_val_split(stenog_dataset)
 
     # set optimizer
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+    optimizer = torch.optim.SGD(model.parameters(), lr=LR)
 
     train_loss = []
     val_loss = []
 
-    for epoch in range(1, 30 + 1):
+    for epoch in range(1, NUM_OF_EPOCHS + 1):
         print('Epoch: ', epoch)
         train(model=model, optimizer=optimizer, train_loader=train_loader)
         train_loss.append(model_check(model=model, loader=train_loader, test_or_val="Train"))
