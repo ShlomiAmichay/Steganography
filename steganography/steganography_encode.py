@@ -3,6 +3,7 @@ import random
 import math
 import os
 
+PROB = 50
 
 def text_to_bits(text, encoding='utf-8', errors='surrogatepass'):
     '''
@@ -185,7 +186,7 @@ if __name__ == "__main__":
 
                 # encrypt image in probability of 1/2
                 prob = random.randrange(0, 100)
-                if prob > 50:
+                if prob > PROB:
                     # take random JS line from our file
                     msg = random_line('text files/1.txt')
                     # encrypt and save random steganography variables chosen
